@@ -1,0 +1,19 @@
+{
+  "name": "@jbang/jbang",
+  "version": "0.1.0",
+  "description": "NPM for JBang",
+  "homepage": "https://github.com/jbangdev/jbang-npm",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jbangdev/jbang-npm.git"
+  },  
+  "main": "jbang.js",
+  "scripts": {
+    "test": "node test.js",
+    "preinstall": "node preinstall.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "shelljs": "^0.8.5"
+  }
+}
