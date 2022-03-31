@@ -1,8 +1,8 @@
 {
   "name": "@jbangdev/jbang",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "NPM for JBang - Java Script in your JavaScript",
-  "homepage": "https://github.com/jbangdev/jbang-npm",
+  "homepage": "https://jbang.dev",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jbangdev/jbang-npm.git"
