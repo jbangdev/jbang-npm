@@ -1,5 +1,8 @@
-# jbang-npm - Java script in your JavaScript
+# jbang-npm - Java Script in your JavaScript
+
 Install and use [JBang](https://www.jbang.dev) from npm based projects
+
+![](java_script.png)
 
 ## Usage
 The `jbang.exec()` function accepts a string that will be passed as the command-line arguments to the `jbang` executable.
@@ -47,6 +50,7 @@ When you run `npm install` - JBang and other dependencies will be installed via 
 Opening a new terminal or shell may be required to be able to use the `jbang` command from the system `PATH`.
 
 ## Using as a dependency
+
 In most cases you should be able to use JBang directly in node scripts.
 
 But if you want to provide more customization you can create your own "wrapper" NPM package. One of the advantages is that you can pre-install the library dependencies needed at the time of `npm install` (just by calling `--help` or a similar "no op" command) so that the user-experience when running the first command after install is better.

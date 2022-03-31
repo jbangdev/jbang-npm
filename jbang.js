@@ -1,6 +1,7 @@
 const shell = require('shelljs');
 const jbang = {};
-jbang.exec = function (argLine) {
+jbang.exec = function (...args) {
+	argLine = args.join(" ");
 	if (shell.which('jbang')
 		|| (process.platform === 'win32' && shell.which('./jbang.cmd')) // windows
 		|| shell.which('./jbang')) {
@@ -18,4 +19,6 @@ jbang.exec = function (argLine) {
 		shell.exit(1);
 	}
 };
+
+//todo: provide more typesafe/argsafe variations with run...
 module.exports = jbang;
