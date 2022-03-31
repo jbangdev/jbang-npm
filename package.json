@@ -1,12 +1,12 @@
 {
-  "name": "@jbang/jbang",
+  "name": "@jbangdev/jbang",
   "version": "0.1.0",
-  "description": "NPM for JBang",
+  "description": "NPM for JBang - Java Script in your JavaScript",
   "homepage": "https://github.com/jbangdev/jbang-npm",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jbangdev/jbang-npm.git"
-  },  
+    "url": "git+https://github.com/jbangdev/jbang-npm.git"
+  },
   "main": "jbang.js",
   "scripts": {
     "test": "node test.js",
@@ -21,5 +21,15 @@
     "jbang.js",
     "test.js",
     "preinstall.js"
-  ]
+  ],
+  "bugs": {
+    "url": "https://github.com/jbangdev/jbang-npm/issues"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "java",
+    "jbang",
+    "java script"
+  ],
+  "author": "JBang Developers"
 }
