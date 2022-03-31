@@ -1,4 +1,4 @@
-# jbang-npm - Java script in your JavaScript projects
+# jbang-npm - Java script in your JavaScript
 Install and use [JBang](https://www.jbang.dev) from npm based projects
 
 ## Usage
