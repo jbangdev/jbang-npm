@@ -15,5 +15,11 @@
   "license": "MIT",
   "dependencies": {
     "shelljs": "^0.8.5"
-  }
+  },
+  "files": [
+    "README.md",
+    "jbang.js",
+    "test.js",
+    "preinstall.js"
+  ]
 }

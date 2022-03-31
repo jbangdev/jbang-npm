@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "test": "node test.js"
+  },
+  "devDependencies": {
+    "//": "using .. for testing local, in real project use specific version",
+    "@jbangdev/jbang": ".."
+  }
+}

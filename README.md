@@ -8,7 +8,7 @@ Given this script `test.js`:
 
 ```js
 #! /usr/bin/env node
-const jbang = require('@jbang/jbang');
+const jbang = require('@jbangdev/jbang');
 jbang.exec('properties@jbangdev');
 ```
 
@@ -20,7 +20,7 @@ And in `package.json`:
     "test": "node test.js"
   },
   "devDependencies": {
-    "@jbang/jbang": "^0.1.0"
+    "@jbangdev/jbang": "^0.1.0"
   }
 }
 ```
