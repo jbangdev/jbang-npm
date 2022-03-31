@@ -1,8 +1,10 @@
 # jbang-npm - Java Script in your JavaScript
 
-Install and use [JBang](https://www.jbang.dev) from npm based projects
+Install and use [JBang](https://www.jbang.dev) from npm based projects.
 
 ![](java_script.png)
+
+Lets you use your own local scripts, [JBang AppStore](https://jbang.dev/appstore) alias or any network reachable jar or Maven artifact.
 
 ## Usage
 The `jbang.exec()` function accepts a string that will be passed as the command-line arguments to the `jbang` executable.
