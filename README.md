@@ -17,7 +17,7 @@ const jbang = require('@jbangdev/jbang');
 jbang.exec('properties@jbangdev');
 ```
 
-And in `package.json`:
+And in `package.json` (use the latest version from [npm](https://www.npmjs.com/package/@jbangdev/jbang)):
 
 ```json
 {
@@ -25,7 +25,7 @@ And in `package.json`:
     "test": "node test.js"
   },
   "devDependencies": {
-    "@jbangdev/jbang": "^0.1.0"
+    "@jbangdev/jbang": "^0.1.4"
   }
 }
 ```
