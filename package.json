@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git+https://github.com/jbangdev/jbang-npm.git"
   },
+  "bin": {
+    "jbang": "bin/index.js"
+  },
   "main": "jbang.js",
   "scripts": {
     "test": "node test.js",
@@ -17,6 +20,7 @@
     "shelljs": "^0.8.5"
   },
   "files": [
+    "bin",
     "README.md",
     "jbang.js",
     "test.js",

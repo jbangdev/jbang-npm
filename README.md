@@ -1,55 +1,62 @@
-# jbang-npm - Java Script in your JavaScript
+# jbang-npm - Java Script in your JavaScript <!-- omit in toc -->
 
-Install and use [JBang](https://www.jbang.dev) from npm based projects.
+Install and use [JBang](https://www.jbang.dev) from NPM based projects.
 
 ![](java_script.png)
 
 Lets you use your own local scripts, [JBang AppStore](https://jbang.dev/appstore) alias or any network reachable jar or Maven artifact.
 
+# Table of Contents <!-- omit in toc -->
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [As a library](#as-a-library)
+    - [exec(string)](#execstring)
+  - [As a CLI](#as-a-cli)
+- [Behind the scenes](#behind-the-scenes)
+- [Using as a dependency](#using-as-a-dependency)
+
+## Installation
+
+`npm i @jbangdev/jbang --save`
+
+Prefer installing the package globally if you want to use it as a CLI wrapper of `JBang`:
+
+`npm i -g @jbangdev/jbang`
+
 ## Usage
+
+You can find the complete documentation about arguments you can pass to the `jbang` executable here: https://www.jbang.dev/documentation/guide/latest/cli/jbang.html.
+
+### As a library
+
+```js
+const jbang = require('@jbangdev/jbang');
+```
+
+`jbang` is an object exposing the following.
+
+#### exec(string)
+
 The `jbang.exec()` function accepts a string that will be passed as the command-line arguments to the `jbang` executable.
 
-Given this script `test.js`:
+Example:
 
 ```js
-#! /usr/bin/env node
-const jbang = require('@jbangdev/jbang');
-jbang.exec('properties@jbangdev');
+jbang.exec('app install --name karate-core com.intuit.karate:karate-core:RELEASE:all');
 ```
 
-And in `package.json` (use the latest version from [npm](https://www.npmjs.com/package/@jbangdev/jbang)):
+### As a CLI
 
-```json
-{
-  "scripts": {
-    "test": "node test.js"
-  },
-  "devDependencies": {
-    "@jbangdev/jbang": "^0.1.4"
-  }
-}
-```
+Package preferably installed globally, you can run in a shell the command named `jbang`.
 
-Now you can invoke the `test` script from the command-line:
+Example:
 
-```
-npm run test
-```
-
-You can easily [pass command-line arguments](https://stackoverflow.com/a/14404223/143475) around:
-
-```js
-let args = process.argv.slice(2).join(' ');
-jbang.exec('com.myco.mylib:RELEASE ' + args);
-```
-
-So now if you run `npm run test arg1 arg2`, `arg1 arg2` will be appended to the command executed.
+`jbang app install --name karate-core com.intuit.karate:karate-core:RELEASE:all`
 
 ## Behind the scenes
 
 When you run `npm install` - JBang and other dependencies will be installed via the [npm `preinstall`](https://docs.npmjs.com/cli/v8/using-npm/scripts#npm-install) hook. This uses the [`app setup`](https://www.jbang.dev/documentation/guide/latest/installation.html#using-jbang) command.
-
-Opening a new terminal or shell may be required to be able to use the `jbang` command from the system `PATH`.
 
 ## Using as a dependency
 
@@ -58,4 +65,3 @@ In most cases you should be able to use JBang directly in node scripts.
 But if you want to provide more customization you can create your own "wrapper" NPM package. One of the advantages is that you can pre-install the library dependencies needed at the time of `npm install` (just by calling `--help` or a similar "no op" command) so that the user-experience when running the first command after install is better.
 
 For an example, refer to the [`@karatelabs/karate`](https://github.com/karatelabs/karate-npm) NPM package.
-
