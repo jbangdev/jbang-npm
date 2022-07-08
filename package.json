@@ -8,7 +8,7 @@
     "url": "git+https://github.com/jbangdev/jbang-npm.git"
   },
   "bin": {
-    "jbang": "bin/index.js"
+    "jbang-npm": "bin/index.js"
   },
   "main": "jbang.js",
   "scripts": {

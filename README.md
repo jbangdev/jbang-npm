@@ -48,11 +48,11 @@ jbang.exec('app install --name karate-core com.intuit.karate:karate-core:RELEASE
 
 ### As a CLI
 
-Package preferably installed globally, you can run in a shell the command named `jbang`.
+Package preferably installed globally, you can run in a shell the command named `jbang-npm`. `jbang-npm` is a simple wrapper of the installed `jbang` executable which prevents you to manually add the command to your path.
 
 Example:
 
-`jbang app install --name karate-core com.intuit.karate:karate-core:RELEASE:all`
+`jbang-npm app install --name karate-core com.intuit.karate:karate-core:RELEASE:all`
 
 ## Behind the scenes
 
