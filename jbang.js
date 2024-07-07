@@ -6,13 +6,13 @@ jbang.exec = function (...args) {
 	if (shell.which('jbang')
 		|| (process.platform === 'win32' && shell.which('./jbang.cmd')) // windows
 		|| shell.which('./jbang')) {
-		console.log('using jbang:', argLine);
+		//console.log('using jbang:', argLine);
 		cmdResult = shell.exec('jbang ' + argLine);
 	} else if (shell.which('curl') && shell.which('bash')) {
-		console.log('using curl + bash:', argLine);
+		//console.log('using curl + bash:', argLine);
 		cmdResult = shell.exec('curl -Ls https://sh.jbang.dev | bash -s - ' + argLine);
 	} else if (shell.which('powershell')) {
-		console.log('using powershell:', argLine);
+		//console.log('using powershell:', argLine);
 		shell.exec('echo iex "& { $(iwr -useb https://ps.jbang.dev) } $args" > %TEMP%/jbang.ps1');
 		cmdResult = shell.exec('powershell -Command "%TEMP%/jbang.ps1 ' + argLine + '"');
 	} else {
