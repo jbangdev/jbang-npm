@@ -56,7 +56,7 @@ Example:
 
 ## Behind the scenes
 
-When you run `npm install` - JBang and other dependencies will be installed via the [npm `preinstall`](https://docs.npmjs.com/cli/v8/using-npm/scripts#npm-install) hook. This uses the [`app setup`](https://www.jbang.dev/documentation/guide/latest/installation.html#using-jbang) command.
+This will look for jbang in path and if not available install it before executing jbang.
 
 ## Using as a dependency
 

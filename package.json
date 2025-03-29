@@ -12,8 +12,7 @@
   },
   "main": "jbang.js",
   "scripts": {
-    "test": "node test.js",
-    "preinstall": "node preinstall.js"
+    "test": "node test.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -23,9 +22,8 @@
     "bin",
     "README.md",
     "jbang.js",
-    "test.js",
-    "preinstall.js"
-  ],
+    "test.js"
+ ],
   "bugs": {
     "url": "https://github.com/jbangdev/jbang-npm/issues"
   },
