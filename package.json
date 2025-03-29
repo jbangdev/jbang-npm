@@ -7,21 +7,23 @@
     "type": "git",
     "url": "git+https://github.com/jbangdev/jbang-npm.git"
   },
+  "bin": {
+    "jbang-npm": "bin/index.js"
+  },
   "main": "jbang.js",
   "scripts": {
-    "test": "node test.js",
-    "preinstall": "node preinstall.js"
+    "test": "node test.js"
   },
   "license": "MIT",
   "dependencies": {
     "shelljs": "^0.8.5"
   },
   "files": [
+    "bin",
     "README.md",
     "jbang.js",
-    "test.js",
-    "preinstall.js"
-  ],
+    "test.js"
+ ],
   "bugs": {
     "url": "https://github.com/jbangdev/jbang-npm/issues"
   },
