@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "shelljs": "^0.8.5"
+    "shelljs": "^0.9.0"
   },
   "files": [
     "bin",
