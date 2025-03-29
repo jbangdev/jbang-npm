@@ -46,6 +46,14 @@ Example:
 jbang.exec('app install --name karate-core com.intuit.karate:karate-core:RELEASE:all');
 ```
 
+#### exec(string)
+
+Same as `jbang.exec` but use `await` to get result.
+
+```js
+await jbang.execAsync('app install --name karate-core com.intuit.karate:karate-core:RELEASE:all');
+```
+
 ### As a CLI
 
 Package preferably installed globally, you can run in a shell the command named `jbang-npm`. `jbang-npm` is a simple wrapper of the installed `jbang` executable which prevents you to manually add the command to your path.
@@ -53,6 +61,10 @@ Package preferably installed globally, you can run in a shell the command named 
 Example:
 
 `jbang-npm app install --name karate-core com.intuit.karate:karate-core:RELEASE:all`
+
+You can also use `npx`:
+
+`npx jbang quarkus@quarkusio`
 
 ## Behind the scenes
 

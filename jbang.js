@@ -1,5 +1,5 @@
 const shell = require('shelljs');
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const jbang = {};
 
 /** Implementing spawnn to ensure terminal interaction works */
@@ -28,7 +28,8 @@ function spawnJbang(args) {
 	});
 }
 
-jbang.exec = async function (...args) {
+// Async version
+jbang.execAsync = async function (...args) {
 	const argLine = args.join(" ");
 	
 	if (shell.which('jbang') || 
@@ -76,6 +77,57 @@ jbang.exec = async function (...args) {
 				}
 			});
 		});
+	} else {
+		throw new Error('unable to pre-install jbang: ' + argLine);
+	}
+};
+
+// Sync version with proper terminal interaction
+jbang.exec = function (...args) {
+	const argLine = args.join(" ");
+	const jbangPath = String(shell.which('jbang') || 
+					 (process.platform === 'win32' && shell.which('./jbang.cmd')) || 
+					 './jbang');
+
+	if (shell.which('jbang') || 
+		(process.platform === 'win32' && shell.which('./jbang.cmd')) || 
+		shell.which('./jbang')) {
+		const result = spawnSync(jbangPath, args, {
+			stdio: 'inherit',
+			shell: true
+		});
+
+		if (result.status !== 0) {
+			throw new Error(`The command failed with code ${result.status}`);
+		}
+		return result;
+	} else if (shell.which('curl') && shell.which('bash')) {
+		const result = spawnSync('curl', ['-Ls', 'https://sh.jbang.dev', '|', 'bash', '-s', '-', ...args], {
+			stdio: 'inherit',
+			shell: true
+		});
+
+		if (result.status !== 0) {
+			throw new Error(`Installation failed with code ${result.status}`);
+		}
+		return result;
+	} else if (shell.which('powershell')) {
+		const scriptContent = 'iex "& { $(iwr -useb https://ps.jbang.dev) } $args"';
+		const tempScript = '%TEMP%/jbang.ps1';
+		
+		// Write the script
+		shell.exec(`echo ${scriptContent} > ${tempScript}`);
+		
+		// Execute the script
+		const result = spawnSync('powershell', ['-Command', `${tempScript} ${argLine}`], {
+			stdio: 'inherit',
+			shell: true
+		});
+
+		if (result.status !== 0) {
+			throw new Error(`Powershell execution failed with code ${result.status}`);
+		}
+		return result;
 	} else {
 		throw new Error('unable to pre-install jbang: ' + argLine);
 	}

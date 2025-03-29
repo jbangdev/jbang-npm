@@ -1,6 +1,6 @@
 {
   "name": "@jbangdev/jbang",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "NPM for JBang - Java Script in your JavaScript",
   "homepage": "https://jbang.dev",
   "repository": {
@@ -23,11 +23,10 @@
     "README.md",
     "jbang.js",
     "test.js"
- ],
+  ],
   "bugs": {
     "url": "https://github.com/jbangdev/jbang-npm/issues"
   },
-  "devDependencies": {},
   "keywords": [
     "java",
     "jbang",
