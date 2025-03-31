@@ -30,7 +30,7 @@ jbang.quote = function quote(xs) {
 function getCommandLine(args) {
 	debug('Searching for jbang executable...');
 	
-	const argLine = jbang.quote(args);
+	const argLine = args.join(" ");
 	const path = shell.which('jbang') || 
 	            (process.platform === 'win32' && shell.which('jbang.cmd')) || 
 				shell.which('~/.jbang/bin/jbang') ||
