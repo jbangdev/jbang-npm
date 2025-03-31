@@ -4,6 +4,20 @@ const debug = require('debug')('jbang');
 
 const jbang = {};
 
+/** Find the path to the jbang executable, returns null if not found */
+function findJbangPath() {
+	const path = shell.which('jbang') || 
+	            (process.platform === 'win32' && shell.which('./jbang.cmd')) || 
+	            shell.which('./jbang') ||
+	            null;
+	if (path) {
+		debug('found existing jbang installation at %s', path);
+	} else {
+		debug('no jbang installation found');
+	}
+	return path;
+}
+
 /** Implementing spawnn to ensure terminal interaction works */
 function spawnJbang(jbangPath, args) {
 	return new Promise((resolve, reject) => {
@@ -38,9 +52,7 @@ jbang.execAsync = async function (...args) {
 	const argLine = args.join(" ");
 	debug('executing async command: %s', argLine);
 	
-	const jbangPath = String(shell.which('jbang') || 
-						 (process.platform === 'win32' && shell.which('./jbang.cmd')) || 
-						 shell.which('./jbang'));
+	const jbangPath = findJbangPath();
 
 	if (jbangPath) {
 		debug('found existing jbang installation at %s', jbangPath);
@@ -70,15 +82,7 @@ jbang.execAsync = async function (...args) {
 		});
 	} else if (shell.which('powershell')) {
 		debug('installing jbang using PowerShell');
-		const scriptContent = 'iex "& { $(iwr -useb https://ps.jbang.dev) } $args"';
-		const tempScript = '%TEMP%/jbang.ps1';
-		
-		// Write the script
-		debug('writing temporary PowerShell script');
-		shell.exec(`echo ${scriptContent} > ${tempScript}`);
-		
-		// Execute the script
-		const powershellProcess = spawn('powershell', ['-Command', `${tempScript} ${argLine}`], {
+		const powershellProcess = spawn('powershell', ['-Command', `iex "& { $(iwr -useb https://ps.jbang.dev) } $args"`, ...args], {
 			stdio: 'inherit',
 			shell: true
 		});
@@ -106,12 +110,9 @@ jbang.exec = function (...args) {
 	const argLine = args.join(" ");
 	debug('executing sync command: %s', argLine);
 	
-	const jbangPath = String(shell.which('jbang') || 
-					 (process.platform === 'win32' && shell.which('./jbang.cmd')) || 
-					 shell.which('./jbang'));
+	const jbangPath = findJbangPath();
 
 	if (jbangPath) {
-		debug('found existing jbang installation at %s', jbangPath);
 		const result = spawnSync(jbangPath, args, {
 			stdio: 'inherit',
 			shell: true
@@ -138,15 +139,7 @@ jbang.exec = function (...args) {
 		return result;
 	} else if (shell.which('powershell')) {
 		debug('installing jbang using PowerShell');
-		const scriptContent = 'iex "& { $(iwr -useb https://ps.jbang.dev) } $args"';
-		const tempScript = '%TEMP%/jbang.ps1';
-		
-		// Write the script
-		debug('writing temporary PowerShell script');
-		shell.exec(`echo ${scriptContent} > ${tempScript}`);
-		
-		// Execute the script
-		const result = spawnSync('powershell', ['-Command', `${tempScript} ${argLine}`], {
+		const result = spawnSync('powershell', ['-Command', `iex "& { $(iwr -useb https://ps.jbang.dev) } $args"`, ...args], {
 			stdio: 'inherit',
 			shell: true
 		});
