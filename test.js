@@ -25,14 +25,10 @@ async function runTests() {
 
     // Test error handling - both sync and async
     console.log('\nTesting error handling...');
-    try {
-        jbang.exec('nonexistent-script-name');
-        console.error('✗ Sync error handling test failed: should have thrown an error');
-        process.exit(1);
-    } catch (err) {
-        console.log('✓ Sync error handling works');
-    }
-
+  
+    out = jbang.exec('nonexistent-script-name');
+    assert.equal(out.exitCode, 2);
+       
     console.log('\n✓ All tests passed!');
 }
 
