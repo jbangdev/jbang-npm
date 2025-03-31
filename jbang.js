@@ -51,13 +51,13 @@ function spawnJbang(jbangPath, args) {
 jbang.exec = function (...args) {
 	argLine = args.join(" ");
 	let cmdResult = null;
-	if (shell.which('jbang')
-		|| (process.platform === 'win32' && shell.which('./jbang.cmd')) // windows
-		|| shell.which('./jbang')) {
-		//console.log('using jbang:', argLine);
+
+	const jbangPath = findJbangPath();
+
+	if (jbangPath) {
 		cmdResult = shell.exec('jbang ' + argLine);
 	} else if (shell.which('curl') && shell.which('bash')) {
-		//console.log('using curl + bash:', argLine);
+		debug('installing jbang using curl and bash');
 		cmdResult = shell.exec('curl -Ls https://sh.jbang.dev | bash -s - ' + argLine);
 	} else if (shell.which('powershell')) {
 		//console.log('using powershell:', argLine);
