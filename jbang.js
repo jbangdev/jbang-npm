@@ -1,17 +1,43 @@
 const shell = require('shelljs');
 const { spawn, spawnSync } = require('child_process');
 const debug = require('debug')('jbang');
-const { quote } = require('shell-quote');
 
 const jbang = {};
+
+jbang.quote = function quote(xs) {
+    return xs.map(function (s) {
+        if (s === '') {
+            return '\'\'';
+        }
+
+        if (s && typeof s === 'object') {
+			debug('s is an object: %o', s);
+            return s.op.replace(/(.)/g, '\\$1');
+        }
+
+        if ((/["\s]/).test(s) && !(/'/).test(s)) {
+			debug('s is a string wituh quote: %o', s);
+            return "'" + s.replace(/(['\\])/g, '\\$1') + "'";
+        }
+
+        if ((/["'\s]/).test(s)) {
+			debug('s is a string with " or \': %o', s);
+            return '"' + s.replace(/(["\\$`!])/g, '\\$1') + '"';
+        }
+
+		debug('s is a weirdstring: %o', s);
+        return String(s).replace(/([A-Za-z]:)?([#!"$&'()*,:;<=>?[\\\]^`{|}])/g, '$1\\$2');
+
+    }).join(' ');
+}
 
 /** Find the path to the jbang executable, alternatively using no-install option.
  * returns a function that can be called with arguments to be appended to the jbang command
  * returns null if not found */
 function getCommandLine(args) {
-	const argLine = quote(args);
+	const argLine = jbang.quote(args);
 	const path = shell.which('jbang') || 
-	            (process.platform === 'win32' && shell.which('./jbang.cmd')) || 
+	            (process.platform === 'win32' && shell.which('jbang.cmd')) || 
 				shell.which('~/.jbang/bin/jbang') ||
 	            null;
 	if (path) {
