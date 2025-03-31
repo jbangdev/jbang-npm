@@ -9,25 +9,18 @@ jbang.quote = function quote(xs) {
         if (s === '') {
             return '\'\'';
         }
-
         if (s && typeof s === 'object') {
-			debug('s is an object: %o', s);
             return s.op.replace(/(.)/g, '\\$1');
         }
 
         if ((/["\s]/).test(s) && !(/'/).test(s)) {
-			debug('s is a string wituh quote: %o', s);
             return "'" + s.replace(/(['\\])/g, '\\$1') + "'";
         }
 
         if ((/["'\s]/).test(s)) {
-			debug('s is a string with " or \': %o', s);
             return '"' + s.replace(/(["\\$`!])/g, '\\$1') + '"';
         }
-
-		debug('s is a weirdstring: %o', s);
         return String(s).replace(/([A-Za-z]:)?([#!"$&'()*,:;<=>?[\\\]^`{|}])/g, '$1\\$2');
-
     }).join(' ');
 }
 
