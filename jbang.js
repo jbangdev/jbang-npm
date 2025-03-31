@@ -2,96 +2,45 @@ const shell = require('shelljs');
 const { spawn, spawnSync } = require('child_process');
 const jbang = {};
 
-/** Implementing spawnn to ensure terminal interaction works */
-function spawnJbang(args) {
-	return new Promise((resolve, reject) => {
-		const jbangPath = String(shell.which('jbang') || 
-						 (process.platform === 'win32' && shell.which('./jbang.cmd')) || 
-						 './jbang');
-		
-		const jbangProcess = spawn(jbangPath, args, {
-			stdio: 'inherit',  // This ensures terminal interaction works
-			shell: true       // This ensures the command works on Windows too
-		});
-
-		jbangProcess.on('close', (code) => {
-			if (code === 0) {
-				resolve();
-			} else {
-				reject(new Error(`The command failed with code ${code}`));
-			}
-		});
-
-		jbangProcess.on('error', (err) => {
-			reject(err);
-		});
-	});
-}
-
-// Async version
-jbang.execAsync = async function (...args) {
-	const argLine = args.join(" ");
-	
-	if (shell.which('jbang') || 
-		(process.platform === 'win32' && shell.which('./jbang.cmd')) || 
-		shell.which('./jbang')) {
-		try {
-			await spawnJbang(args);
-		} catch (err) {
-			throw err;
-		}
+jbang.exec = function (...args) {
+	argLine = args.join(" ");
+	let cmdResult = null;
+	if (shell.which('jbang')
+		|| (process.platform === 'win32' && shell.which('./jbang.cmd')) // windows
+		|| shell.which('./jbang')) {
+		//console.log('using jbang:', argLine);
+		cmdResult = shell.exec('jbang ' + argLine);
 	} else if (shell.which('curl') && shell.which('bash')) {
-		const installProcess = spawn('curl', ['-Ls', 'https://sh.jbang.dev', '|', 'bash', '-s', '-', ...args], {
-			stdio: 'inherit',
-			shell: true
-		});
-		
-		return new Promise((resolve, reject) => {
-			installProcess.on('close', (code) => {
-				if (code === 0) {
-					resolve();
-				} else {
-					reject(new Error(`Installation failed with code ${code}`));
-				}
-			});
-		});
+		//console.log('using curl + bash:', argLine);
+		cmdResult = shell.exec('curl -Ls https://sh.jbang.dev | bash -s - ' + argLine);
 	} else if (shell.which('powershell')) {
-		const scriptContent = 'iex "& { $(iwr -useb https://ps.jbang.dev) } $args"';
-		const tempScript = '%TEMP%/jbang.ps1';
-		
-		// Write the script
-		shell.exec(`echo ${scriptContent} > ${tempScript}`);
-		
-		// Execute the script
-		const powershellProcess = spawn('powershell', ['-Command', `${tempScript} ${argLine}`], {
-			stdio: 'inherit',
-			shell: true
-		});
-		
-		return new Promise((resolve, reject) => {
-			powershellProcess.on('close', (code) => {
-				if (code === 0) {
-					resolve();
-				} else {
-					reject(new Error(`Powershell execution failed with code ${code}`));
-				}
-			});
-		});
+		//console.log('using powershell:', argLine);
+		shell.exec('echo iex "& { $(iwr -useb https://ps.jbang.dev) } $args" > %TEMP%/jbang.ps1');
+		cmdResult = shell.exec('powershell -Command "%TEMP%/jbang.ps1 ' + argLine + '"');
 	} else {
-		throw new Error('unable to pre-install jbang: ' + argLine);
+		shell.echo('unable to pre-install jbang:', argLine);
+		shell.exit(1);
 	}
+
+	if (cmdResult?.code !== 0) {
+		const err = new Error(`The command failed: 'jbang ${argLine}'. Code: ${cmdResult?.code}`);
+		err.code = cmdResult?.code;
+		err.cause = cmdResult.stderr;
+
+		throw err;
+	}
+
+	return cmdResult;
 };
 
 // Sync version with proper terminal interaction
-jbang.exec = function (...args) {
+jbang.spawnSync = function (...args) {
 	const argLine = args.join(" ");
 	const jbangPath = String(shell.which('jbang') || 
 					 (process.platform === 'win32' && shell.which('./jbang.cmd')) || 
-					 './jbang');
+					 shell.which('./jbang'));
 
-	if (shell.which('jbang') || 
-		(process.platform === 'win32' && shell.which('./jbang.cmd')) || 
-		shell.which('./jbang')) {
+	if (jbangPath) {
 		const result = spawnSync(jbangPath, args, {
 			stdio: 'inherit',
 			shell: true
