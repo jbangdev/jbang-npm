@@ -8,33 +8,27 @@ const jbang = {};
 /** Find the path to the jbang executable, alternatively using no-install option.
  * returns a function that can be called with arguments to be appended to the jbang command
  * returns null if not found */
-function findJbangPath() {
+function getCommandLine(args) {
+	const argLine = quote(args);
 	const path = shell.which('jbang') || 
 	            (process.platform === 'win32' && shell.which('./jbang.cmd')) || 
 				shell.which('~/.jbang/bin/jbang') ||
 	            null;
 	if (path) {
 		debug('found existing jbang installation at %s', path.toString());
-		return (args = []) => [path.toString(), ...args] // ensure it is a string not String and append list of arguments
+		return [path.toString(),argLine].join(' ');// ensure it is a string not String and append list of arguments
 	} else if(shell.which('curl') && shell.which('bash')) {
 		debug('running jbang using curl and bash');
-		return (args = []) => ["curl", "-Ls", "https://sh.jbang.dev", "|", "bash", "-s", "-", ...args];
+		return ["curl", "-Ls", "https://sh.jbang.dev", "|", "bash", "-s", "-", argLine].join(' ');
 	} else if(shell.which('powershell')) {
 		debug('running jbang using PowerShell');
-		return (args = []) => ["powershell", "-Command", "iex \"& { $(iwr -useb https://ps.jbang.dev) } $args\""];
+		return ["powershell", "-Command", "iex \"& { $(iwr -useb https://ps.jbang.dev) } $argLine\""].join(' ');
 	} else {
 		debug('no jbang installation found');
 		return null;
 	}
 }
 
-function getCommandLine(args) {
-	const jbangPath = findJbangPath();
-	if (jbangPath) {
-		return quote(jbangPath(args));
-	}
-	return null;
-}
 
 /** Implementing spawnn to ensure terminal interaction works */
 function spawnJbang(jbangPath) {
