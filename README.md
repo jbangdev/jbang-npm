@@ -46,13 +46,15 @@ Example:
 jbang.exec('app install --name karate-core com.intuit.karate:karate-core:RELEASE:all');
 ```
 
-#### exec(string)
+#### spawnSync(string)
 
-Same as `jbang.exec` but use `await` to get result.
+Use `spawnSync` to run the command in the same process/stdin/signals.
 
 ```js
-await jbang.execAsync('app install --name karate-core com.intuit.karate:karate-core:RELEASE:all');
+await jbang.spawnSync('app install --name karate-core com.intuit.karate:karate-core:RELEASE:all');
 ```
+
+Primarily used by the `jbang-npm` CLI.
 
 ### As a CLI
 
