@@ -33,6 +33,13 @@ const jbang = require('./jbang');
         out = jbang.exec('nonexistent-script-name');
         assert.equal(out.exitCode, 2);
 
+        console.log("\nTesting multiple arguments...");
+        out = jbang.exec('-D="funky bear" properties@jbangdev');
+        assert.equal(out.exitCode, 0);
+        assert(out.stdout.includes('funky bear'));
+ 
+        console.log("✓ Multiple arguments test works");
+
         console.log('\n✓ All tests passed!');
     }
 

@@ -28,6 +28,8 @@ jbang.quote = function quote(xs) {
  * returns a function that can be called with arguments to be appended to the jbang command
  * returns null if not found */
 function getCommandLine(args) {
+	debug('Searching for jbang executable...');
+	
 	const argLine = jbang.quote(args);
 	const path = shell.which('jbang') || 
 	            (process.platform === 'win32' && shell.which('jbang.cmd')) || 
