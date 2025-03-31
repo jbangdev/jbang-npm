@@ -31,6 +31,8 @@ jobs:
       run: npm ci
     
     - name: Run tests
+      env:
+        DEBUG: jbang
       run: npm test
     
     - name: Verify package can be installed and run

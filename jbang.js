@@ -1,26 +1,37 @@
 const shell = require('shelljs');
 const { spawn, spawnSync } = require('child_process');
 const debug = require('debug')('jbang');
+const { quote } = require('shell-quote');
 
 const jbang = {};
 
-/** Find the path to the jbang executable, returns null if not found */
-function findJbangPath() {
+/** Find the path to the jbang executable, alternatively using no-install option.
+ * returns a function that can be called with arguments to be appended to the jbang command
+ * returns null if not found */
+function getCommandLine(args) {
+	const argLine = quote(args);
 	const path = shell.which('jbang') || 
 	            (process.platform === 'win32' && shell.which('./jbang.cmd')) || 
-	            shell.which('./jbang') ||
+				shell.which('~/.jbang/bin/jbang') ||
 	            null;
 	if (path) {
-		debug('found existing jbang installation at %s', path);
-		return path.toString(); // ensure it is a string not String
+		debug('found existing jbang installation at %s', path.toString());
+		return [path.toString(),argLine].join(' ');// ensure it is a string not String and append list of arguments
+	} else if(shell.which('curl') && shell.which('bash')) {
+		debug('running jbang using curl and bash');
+		return ["curl", "-Ls", "https://sh.jbang.dev", "|", "bash", "-s", "-", argLine].join(' ');
+	} else if(shell.which('powershell')) {
+		debug('running jbang using PowerShell');
+		return ["powershell", "-Command", "iex \"& { $(iwr -useb https://ps.jbang.dev) } $argLine\""].join(' ');
 	} else {
 		debug('no jbang installation found');
 		return null;
 	}
 }
 
+
 /** Implementing spawnn to ensure terminal interaction works */
-function spawnJbang(jbangPath, args) {
+function spawnJbang(jbangPath) {
 	return new Promise((resolve, reject) => {
 		
 		debug('spawning process with path: %s', jbangPath);
@@ -49,85 +60,44 @@ function spawnJbang(jbangPath, args) {
 }
 
 jbang.exec = function (...args) {
-	argLine = args.join(" ");
+	debug('try to execute async command: %o', args);
+
 	let cmdResult = null;
 
-	const jbangPath = findJbangPath();
+	const cmdLine = getCommandLine(args);
 
-	if (jbangPath) {
-		cmdResult = shell.exec('jbang ' + argLine);
-	} else if (shell.which('curl') && shell.which('bash')) {
-		debug('installing jbang using curl and bash');
-		cmdResult = shell.exec('curl -Ls https://sh.jbang.dev | bash -s - ' + argLine);
-	} else if (shell.which('powershell')) {
-		//console.log('using powershell:', argLine);
-		shell.exec('echo iex "& { $(iwr -useb https://ps.jbang.dev) } $args" > %TEMP%/jbang.ps1');
-		cmdResult = shell.exec('powershell -Command "%TEMP%/jbang.ps1 ' + argLine + '"');
+	if (cmdLine) {
+		debug('executing command: %s', cmdLine);
+		cmdResult = shell.exec(cmdLine);
 	} else {
-		shell.echo('unable to pre-install jbang:', argLine);
-		shell.exit(1);
+		shell.echo('Could not locate a way to run jbang. Try install jbang manually and try again.');
+		throw new Error('Could not locate a way to run jbang. Try install jbang manually and try again.', 2);
 	}
 
-	if (cmdResult?.code !== 0) {
-		const err = new Error(`The command failed: 'jbang ${argLine}'. Code: ${cmdResult?.code}`);
-		err.code = cmdResult?.code;
-		err.cause = cmdResult.stderr;
-
-		throw err;
-	}
-
-	return cmdResult;
+	return {
+		stdout: cmdResult.stdout,
+		stderr: cmdResult.stderr,
+		exitCode: cmdResult.code
+	};
 };
 
 // Sync version with proper terminal interaction
 jbang.spawnSync = function (...args) {
-	const argLine = args.join(" ");
-	debug('executing sync command: %s', argLine);
+	debug('try to execute sync command: %o', args);
 	
-	const jbangPath = findJbangPath();
+	const cmdLine = getCommandLine(args);
 
-	if (jbangPath) {
-		const result = spawnSync(jbangPath, args, {
+	if (cmdLine) {
+		debug('executing sync command: %s', cmdLine);
+		const result = spawnSync(cmdLine, {
 			stdio: 'inherit',
 			shell: true
 		});
-
-		if (result.status !== 0) {
-			debug('command failed with code: %d', result.status);
-			throw new Error(`The command failed with code ${result.status}`);
-		}
-		debug('command completed successfully');
+		debug('command completed successfully: %o', result);
 		return result;
-	} else if (shell.which('curl') && shell.which('bash')) {
-		debug('installing jbang using curl and bash');
-		const result = spawnSync('curl', ['-Ls', 'https://sh.jbang.dev', '|', 'bash', '-s', '-', ...args], {
-			stdio: 'inherit',
-			shell: true
-		});
-
-		if (result.status !== 0) {
-			debug('installation failed with code: %d', result.status);
-			throw new Error(`Installation failed with code ${result.status}`);
-		}
-		debug('installation completed successfully');
-		return result;
-	} else if (shell.which('powershell')) {
-		debug('installing jbang using PowerShell');
-		const result = spawnSync('powershell', ['-Command', `iex "& { $(iwr -useb https://ps.jbang.dev) } $args"`, ...args], {
-			stdio: 'inherit',
-			shell: true
-		});
-
-		if (result.status !== 0) {
-			debug('PowerShell execution failed with code: %d', result.status);
-			throw new Error(`Powershell execution failed with code ${result.status}`);
-		}
-		debug('PowerShell installation completed successfully');
-		return result;
-	} else {
-		const err = new Error('unable to pre-install jbang: ' + argLine);
-		debug('error: %o', err);
-		throw err;
+	}  else {
+		shell.echo('Could not locate a way to run jbang. Try install jbang manually and try again.');
+		throw new Error('Could not locate a way to run jbang. Try install jbang manually and try again.', 2);
 	}
 };
 

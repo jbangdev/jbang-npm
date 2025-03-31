@@ -6,5 +6,5 @@ test:
 
 
 # Create a new release using GitHub CLI
-release version:
+release:
     gh release create $(node -p "require('./package.json').version") --generate-notes
