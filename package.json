@@ -1,6 +1,6 @@
 {
   "name": "@jbangdev/jbang",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "NPM for JBang - Java Script in your JavaScript",
   "homepage": "https://jbang.dev",
   "repository": {
@@ -39,6 +39,8 @@
   ],
   "author": "JBang Developers",
   "jest": {
-   "testPathIgnorePatterns": ["demo"]
+    "testPathIgnorePatterns": [
+      "demo"
+    ]
   }
 }
