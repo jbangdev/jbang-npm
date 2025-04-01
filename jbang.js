@@ -4,21 +4,33 @@ const debug = require('debug')('jbang');
 
 const jbang = {};
 
+function escapeCmdArgument(arg) {
+    const cmdSafeChars = /^[a-zA-Z0-9.,_+=:;@()-\\]*$/;
+    if (!cmdSafeChars.test(arg)) {
+        // Windows quoting is just weird
+        arg = arg.replace(/([()!^<>&|% ])/g, '^$1');
+        arg = arg.replace(/(["])/g, '\\^$1');
+        arg = '^"' + arg + '^"';
+    }
+    return arg;
+}
+
+function escapeBashArgument(arg) {
+    const shellSafeChars = /^[a-zA-Z0-9._+=:@%/-]*$/;
+    if (!shellSafeChars.test(arg)) {
+        arg = arg.replace(/(['])/g, "'\\''");
+        arg = "'" + arg + "'";
+    }
+    return arg;
+}
+
+
 jbang.quote = function quote(xs) {
     return xs.map(function (s) {
-        if (s === '') {
-            return '\'\'';
-        }
-      
-
-        if ((/["\s]/).test(s) && !(/'/).test(s)) {
-            return "'" + s.replace(/(['\\])/g, '\\$1') + "'";
-        }
-
-        if ((/["'\s]/).test(s)) {
-            return '"' + s.replace(/(["\\$`!])/g, '\\$1') + '"';
-        }
-        return String(s).replace(/([A-Za-z]:)?([#!"$&'()*,:;<=>?[\\\]^`{|}])/g, '$1\\$2');
+		if (process.platform === 'win32') {
+			return escapeCmdArgument(s);
+		}
+		return escapeBashArgument(s);
     }).join(' ');
 }
 

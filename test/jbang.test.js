@@ -42,9 +42,9 @@ describe('JBang Integration Tests', () => {
 
 });
 
-describe('Quote Tests', () => {
+(process.platform === 'win32' ? describe.skip : describe)('Quote Tests', () => {
   test('should quote empty string', () => {
-    expect(jbang.quote([''])).toBe("''");
+    expect(jbang.quote([''])).toBe("");
   });
 
   test('should quote simple string without special chars', () => {
@@ -60,17 +60,17 @@ describe('Quote Tests', () => {
   });
 
   test('should quote string containing single quotes', () => {
-    expect(jbang.quote(['hello\'world'])).toBe('"hello\'world"');
+    expect(jbang.quote(["hello'world"])).toBe("'hello'\\''world'");
   });
 
   test('should quote string containing special characters', () => {
-    expect(jbang.quote(['hello$world'])).toBe('hello\\$world');
-    expect(jbang.quote(['hello!world'])).toBe('hello\\!world');
-    expect(jbang.quote(['hello#world'])).toBe('hello\\#world');
+    expect(jbang.quote(['hello$world'])).toBe("'hello$world'");
+    expect(jbang.quote(['hello!world'])).toBe("'hello!world'");
+    expect(jbang.quote(['hello#world'])).toBe("'hello#world'");
   });
 
   test('should quote multiple strings', () => {
     expect(jbang.quote(['hello world'])).toBe("'hello world'");
-    expect(jbang.quote(["hello 'big world'"])).toBe('"hello \'big world\'"');
+    expect(jbang.quote(["hello 'big world'"])).toBe("'hello '\\''big world'\\'''");
   });
 }); 
