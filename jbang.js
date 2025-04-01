@@ -42,7 +42,7 @@ function getCommandLine(args) {
 	const path =
 			(process.platform === 'win32' && shell.which('jbang.cmd')) || 
 			shell.which('jbang') ||
-			(process.platform === 'win32' && shell.which('~/.jbang/bin/jbang.cmd')) || 
+			(process.platform === 'win32' && shell.which('~\.jbang\bin\jbang.cmd')) || 
 			shell.which('~/.jbang/bin/jbang') ||
 			null;
 	if (path) {

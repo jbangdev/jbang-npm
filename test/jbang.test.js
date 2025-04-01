@@ -17,15 +17,15 @@ describe('JBang Integration Tests', () => {
   });
 
   test('should handle multiple arguments as string', () => {
-    const result = jbang.exec('-Dx="funky bear" properties@jbangdev');
+    const result = jbang.exec('-Dx="funky string" properties@jbangdev');
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain('funky bear');
+    expect(result.stdout).toContain('funky string');
   });
 
   test('should handle multiple arguments as array', () => {
-    const result = jbang.exec(['-Dx=funky bear', 'properties@jbangdev']);
+    const result = jbang.exec(['-Dx=funky list', 'properties@jbangdev']);
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain('funky bear');
+    expect(result.stdout).toContain('funky list');
   });
 
   test('should handle Java version specification', () => {
@@ -40,12 +40,6 @@ describe('JBang Integration Tests', () => {
     expect(result.stderr).toContain('Invalid version');
   });
 
-  test('should handle quotes in arguments', () => {
-    const result = jbang.exec('-Dxyz="funky bear" properties@jbangdev');
-    expect(result).toBeDefined();
-    expect(result.exitCode).toBe(0);
-    expect(result.stdout).toMatch(/xyz.*funky bear/);
-  });
 });
 
 describe('Quote Tests', () => {
