@@ -39,10 +39,12 @@ function getCommandLine(args) {
 	}
 
 	
-	const path = shell.which('jbang') || 
-	            (process.platform === 'win32' && shell.which('jbang.cmd')) || 
-				shell.which('~/.jbang/bin/jbang') ||
-	            null;
+	const path =
+			(process.platform === 'win32' && shell.which('jbang.cmd')) || 
+			shell.which('jbang') ||
+			(process.platform === 'win32' && shell.which('~/.jbang/bin/jbang.cmd')) || 
+			shell.which('~/.jbang/bin/jbang') ||
+			null;
 	if (path) {
 		debug('found existing jbang installation at %s', path.toString());
 		return [path.toString(),argLine].join(' ');// ensure it is a string not String and append list of arguments
