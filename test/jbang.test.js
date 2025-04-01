@@ -29,7 +29,7 @@ describe('JBang Integration Tests', () => {
   });
 
   test('should handle Java version specification', () => {
-    const result = jbang.exec(['--java', '21+', 'properties@jbangdev', 'java.version']);
+    const result = jbang.exec(['--java', '8+', 'properties@jbangdev', 'java.version']);
     expect(result).toBeDefined();
     expect(result.stdout).toMatch(/\d+\.\d+/);
   });

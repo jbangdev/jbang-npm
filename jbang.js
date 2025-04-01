@@ -4,6 +4,9 @@ const debug = require('debug')('jbang');
 
 const jbang = {};
 
+// used shell quote before but it is
+//  not working for Windows so ported from jbang
+
 function escapeCmdArgument(arg) {
     const cmdSafeChars = /^[a-zA-Z0-9.,_+=:;@()-\\]*$/;
     if (!cmdSafeChars.test(arg)) {
