@@ -9,9 +9,7 @@ jbang.quote = function quote(xs) {
         if (s === '') {
             return '\'\'';
         }
-        if (s && typeof s === 'object') {
-            return s.op.replace(/(.)/g, '\\$1');
-        }
+      
 
         if ((/["\s]/).test(s) && !(/'/).test(s)) {
             return "'" + s.replace(/(['\\])/g, '\\$1') + "'";
@@ -30,7 +28,17 @@ jbang.quote = function quote(xs) {
 function getCommandLine(args) {
 	debug('Searching for jbang executable...');
 	
-	const argLine = args.join(" ");
+	debug('args type: %s', typeof args);
+	// If args is a string, parse it into a list
+	if (typeof args === 'string' ) {
+		debug("args is a string, use as is");
+		argLine = args;
+	} else { // else it is already a list and we need to quote each argument before joining them
+		debug("args is a list, quoting each argument");
+		argLine = jbang.quote(args);
+	}
+
+	
 	const path = shell.which('jbang') || 
 	            (process.platform === 'win32' && shell.which('jbang.cmd')) || 
 				shell.which('~/.jbang/bin/jbang') ||
@@ -40,47 +48,17 @@ function getCommandLine(args) {
 		return [path.toString(),argLine].join(' ');// ensure it is a string not String and append list of arguments
 	} else if(shell.which('curl') && shell.which('bash')) {
 		debug('running jbang using curl and bash');
-		return ["curl", "-Ls", "https://sh.jbang.dev", "|", "bash", "-s", "-", argLine].join(' ');
+		return ["curl -Ls https://sh.jbang.dev | bash -s -", argLine].join(' ');
 	} else if(shell.which('powershell')) {
 		debug('running jbang using PowerShell');
-		return ["powershell", "-Command", "iex \"& { $(iwr -useb https://ps.jbang.dev) } $argLine\""].join(' ');
+		return `powershell -Command iex "& { $(iwr -useb https://ps.jbang.dev) } ${argLine}"`;
 	} else {
 		debug('no jbang installation found');
 		return null;
 	}
 }
 
-
-/** Implementing spawnn to ensure terminal interaction works */
-function spawnJbang(jbangPath) {
-	return new Promise((resolve, reject) => {
-		
-		debug('spawning process with path: %s', jbangPath);
-		debug('arguments: %o', args);
-
-		const jbangProcess = spawn(jbangPath, args, {
-			stdio: 'inherit',  // This ensures terminal interaction works
-			shell: true       // This ensures the command works on Windows too
-		});
-
-		jbangProcess.on('close', (code) => {
-			if (code === 0) {
-				debug('process completed successfully');
-				resolve();
-			} else {
-				debug('process failed with code: %d', code);
-				reject(new Error(`The command failed with code ${code}`));
-			}
-		});
-
-		jbangProcess.on('error', (err) => {
-			debug('process error: %o', err);
-			reject(err);
-		});
-	});
-}
-
-jbang.exec = function (...args) {
+jbang.exec = function (args) {
 	debug('try to execute async command: %o', args);
 
 	let cmdResult = null;
@@ -103,13 +81,13 @@ jbang.exec = function (...args) {
 };
 
 // Sync version with proper terminal interaction
-jbang.spawnSync = function (...args) {
+jbang.spawnSync = function (args) {
 	debug('try to execute sync command: %o', args);
 	
 	const cmdLine = getCommandLine(args);
 
 	if (cmdLine) {
-		debug('executing sync command: %s', cmdLine);
+		debug('spawning sync command: %s', cmdLine);
 		const result = spawnSync(cmdLine, {
 			stdio: 'inherit',
 			shell: true
