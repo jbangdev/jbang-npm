@@ -1,6 +1,9 @@
 const shell = require('shelljs');
 const { spawn, spawnSync } = require('child_process');
 const debug = require('debug')('jbang');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
 const jbang = {};
 
@@ -37,6 +40,30 @@ jbang.quote = function quote(xs) {
     }).join(' ');
 }
 
+// %USERPROFILE%\.jbang\bin\jbang.cmd
+// path.join keeps each segment out of a JavaScript string, where \b is a
+// backspace and the other backslashes are discarded. shell.which() only
+// treats a value containing '/' as a filesystem path, so the win32 result
+// is checked with fs rather than passed to which().
+function windowsHomeJbangCmd(homedir = os.homedir(), pathImpl = path) {
+	return pathImpl.join(homedir, '.jbang', 'bin', 'jbang.cmd');
+}
+
+function resolveWindowsHomeJbang(homedir = os.homedir(), pathImpl = path) {
+	const candidate = windowsHomeJbangCmd(homedir, pathImpl);
+	try {
+		if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+			return candidate;
+		}
+	} catch (err) {
+		debug('windows home jbang lookup failed: %o', err);
+	}
+	return null;
+}
+
+jbang.windowsHomeJbangCmd = windowsHomeJbangCmd;
+jbang.resolveWindowsHomeJbang = resolveWindowsHomeJbang;
+
 /** Find the path to the jbang executable, alternatively using no-install option.
  * returns a function that can be called with arguments to be appended to the jbang command
  * returns null if not found */
@@ -54,15 +81,15 @@ function getCommandLine(args) {
 	}
 
 	
-	const path =
-			(process.platform === 'win32' && shell.which('jbang.cmd')) || 
+	const jbangExecutable =
+			(process.platform === 'win32' && shell.which('jbang.cmd')) ||
 			shell.which('jbang') ||
-			(process.platform === 'win32' && shell.which('~\.jbang\bin\jbang.cmd')) || 
+			(process.platform === 'win32' && resolveWindowsHomeJbang()) ||
 			shell.which('~/.jbang/bin/jbang') ||
 			null;
-	if (path) {
-		debug('found existing jbang installation at %s', path.toString());
-		return [path.toString(),argLine].join(' ');// ensure it is a string not String and append list of arguments
+	if (jbangExecutable) {
+		debug('found existing jbang installation at %s', jbangExecutable.toString());
+		return [jbangExecutable.toString(),argLine].join(' ');// ensure it is a string not String and append list of arguments
 	} else if(shell.which('curl') && shell.which('bash')) {
 		debug('running jbang using curl and bash');
 		return ["curl -Ls https://sh.jbang.dev | bash -s -", argLine].join(' ');
