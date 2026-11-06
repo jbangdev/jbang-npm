@@ -1,3 +1,6 @@
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const jbang = require('../jbang');
 
 describe('JBang Integration Tests', () => {
@@ -37,7 +40,7 @@ describe('JBang Integration Tests', () => {
   test('should handle invalid java version gracefully', () => {
     const result = jbang.exec('--java invalid properties@jbangdev java.version');
     expect(result).toBeDefined();
-    expect(result.stderr).toContain('Invalid version');
+    expect(result.stderr).toContain('Invalid value for');
   });
 
 });
@@ -73,4 +76,39 @@ describe('JBang Integration Tests', () => {
     expect(jbang.quote(['hello world'])).toBe("'hello world'");
     expect(jbang.quote(["hello 'big world'"])).toBe("'hello '\\''big world'\\'''");
   });
-}); 
+});
+
+describe('Windows home path', () => {
+  test('joins home, .jbang, bin, and jbang.cmd without backslash escapes', () => {
+    const home = 'C:\\Users\\tester';
+    const candidate = jbang.windowsHomeJbangCmd(home, path.win32);
+
+    expect(candidate).toBe(path.win32.join(home, '.jbang', 'bin', 'jbang.cmd'));
+    expect(candidate).toBe('C:\\Users\\tester\\.jbang\\bin\\jbang.cmd');
+    expect(candidate.includes('\b')).toBe(false);
+
+    // The old literal is mangled: \. and \j drop the backslash, and \b is a backspace.
+    const mangledLiteral = '~\.jbang\bin\jbang.cmd';
+    expect(mangledLiteral).toBe('~.jbang\u0008injbang.cmd');
+    expect(mangledLiteral).not.toBe(path.win32.join('~', '.jbang', 'bin', 'jbang.cmd'));
+  });
+
+  test('returns the home jbang.cmd when that file exists and null when it does not', () => {
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'jbang-home-'));
+    try {
+      expect(jbang.resolveWindowsHomeJbang(home, path)).toBeNull();
+
+      const cmd = path.join(home, '.jbang', 'bin', 'jbang.cmd');
+      fs.mkdirSync(path.dirname(cmd), { recursive: true });
+      fs.writeFileSync(cmd, '');
+      expect(jbang.resolveWindowsHomeJbang(home, path)).toBe(cmd);
+
+      fs.rmSync(cmd);
+      fs.mkdirSync(cmd);
+      expect(jbang.resolveWindowsHomeJbang(home, path)).toBeNull();
+    } finally {
+      fs.rmSync(home, { recursive: true, force: true });
+    }
+  });
+});
+
