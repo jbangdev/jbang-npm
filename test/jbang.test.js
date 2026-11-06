@@ -40,7 +40,7 @@ describe('JBang Integration Tests', () => {
   test('should handle invalid java version gracefully', () => {
     const result = jbang.exec('--java invalid properties@jbangdev java.version');
     expect(result).toBeDefined();
-    expect(result.stderr).toContain('Invalid version');
+    expect(result.stderr).toContain('Invalid value for');
   });
 
 });
@@ -111,3 +111,4 @@ describe('Windows home path', () => {
     }
   });
 });
+
